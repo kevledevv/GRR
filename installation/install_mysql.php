@@ -30,13 +30,17 @@ $twig->addExtension(new TwigGRR());
 
 $nom_fic = "../personnalisation/connect.inc.php";
 $etape = isset($_GET["etape"]) ? $_GET["etape"] : NULL;
-$adresse_db = isset($_GET["adresse_db"]) ? $_GET["adresse_db"] : NULL;
-$port_db = isset($_GET["port_db"]) ? $_GET["port_db"] : NULL;
-$login_db = isset($_GET["login_db"]) ? $_GET["login_db"] : NULL;
-$pass_db = isset($_GET["pass_db"]) ? $_GET["pass_db"] : NULL;
-$choix_db = isset($_GET["choix_db"]) ? $_GET["choix_db"] : NULL;
+$adresse_db = isset($_GET["adresse_db"]) ? $_GET["adresse_db"] : getenv('DATABASE_HOST');
+$port_db = isset($_GET["port_db"]) ? $_GET["port_db"] : 3306;
+$login_db = isset($_GET["login_db"]) ? $_GET["login_db"] : getenv('DATABASE_USERNAME');
+$pass_db = isset($_GET["pass_db"]) ? $_GET["pass_db"] : getenv('DATABASE_PASSWORD');
+$choix_db = isset($_GET["choix_db"]) ? $_GET["choix_db"] : getenv('DATABASE_NAME');
 $table_new = isset($_GET["table_new"]) ? $_GET["table_new"] : NULL;
-$table_prefix = isset($_GET["table_prefix"]) ? $_GET["table_prefix"] : NULL;
+$table_prefix = isset($_GET["table_prefix"]) ? $_GET["table_prefix"] : 'grr';
+
+if ($etape == 1 && !empty($adresse_db) && !empty($port_db) && !empty($login_db) && !empty($pass_db) && !empty($choix_db)) {
+	$etape = 3;
+}
 
 $d['dbsys']			= $dbsys;
 $d['nom_fic']		= $nom_fic;

@@ -1,0 +1,81 @@
+- group: [docker, dkr]
+  name: [start, s]
+  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml up -d --force-recreate --remove-orphans
+  desc: Start/restart the docker container
+  flags:
+    - name: [production]
+      desc: Use production compose file
+      default: false
+      test: $bool
+
+- group: docker
+  name: [stop, k]
+  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml down --remove-orphans
+  desc: Stop the docker container
+  flags:
+    - name: [production]
+      desc: Use production compose file
+      default: false
+      test: $bool
+
+- group: docker
+  name: [exec, x]
+  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml exec -it {{ .container }} /bin/sh
+  desc: Open a bash terminal inside a container (default web)
+  args:
+    - name: container
+      default: web
+      desc: the container to connect to
+  flags:
+    - name: [production]
+      desc: Use production compose file
+      default: false
+      test: $bool
+      
+- group: docker
+  name: [logs, l]
+  cmd: >
+    docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml
+    logs
+    --no-log-prefix
+    --tail {{ .tail }}
+    {{ if .follow }} -f{{ end }}
+    {{ .name }}
+  desc: Print last lines of the server logs
+  args:
+    - name: name
+      desc: Service name
+      default: web
+  flags:
+    - name: [tail, t]
+      desc: Number of lines to print
+      default: 30
+      test: $uint
+    - name: [follow, f]
+      desc: Follow log output
+      default: false
+      test: $bool
+    - name: [env, e]
+      desc: Environment
+      test: ^(dev|staging|production)$
+      default: dev
+    - name: [production]
+      desc: Use production compose file
+      default: false
+      test: $bool
+  cwd: .
+
+- group: docker
+  name: [build, b]
+  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml build --no-cache
+  flags:
+    - name: [production]
+      desc: Use production compose file
+      default: false
+      test: $bool
+  desc: Rebuild the docker container image
+
+- name: [mkcert, ssl]
+  desc: Generate a self-signed certificates, and install it to be valid
+  cmd: mkcert -cert-file dev.crt -key-file dev.key -install theshop.localhost *.theshop.localhost portal-pos.localhost *.portal-pos.localhost && cat dev.crt dev.key > ssl.pem
+  cwd: ./docker/proxy

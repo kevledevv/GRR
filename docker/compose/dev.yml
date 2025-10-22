@@ -1,0 +1,51 @@
+services:
+  web:
+    container_name: grr
+    restart: unless-stopped
+    build:
+      context: ../php
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/app/
+    environment:
+      PHP_LOG: stdout
+      VIRTUAL_HOST: grr.localhost
+      DATABASE_NAME: grr
+      DATABASE_USERNAME: grr
+      DATABASE_PASSWORD: ZdGJ4nFP4m8ye8qu
+      DATABASE_HOST: db
+    depends_on:
+      - db
+
+  db:
+    container_name: grr-db
+    restart: unless-stopped
+    image: mariadb:10.3.39
+    command: mysqld --sql_mode=""
+    volumes:
+      - mysql:/var/lib/mysql
+      # - ../installation/tables.my.sql:/docker-entrypoint-initdb.d/db.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: blunt&snakesR1337
+      MYSQL_DATABASE: grr
+      MYSQL_USER: grr
+      MYSQL_PASSWORD: ZdGJ4nFP4m8ye8qu
+    ports:
+      - 23706:3306
+
+  # HTTP proxy
+  proxy:
+    restart: unless-stopped
+    image: haproxy:2.9.4-alpine
+    volumes:
+      - ./proxy:/usr/local/etc/haproxy
+    depends_on:
+      - web
+    ports:
+      - target: 443
+        published: 23703
+        mode: host
+
+volumes:
+  mysql:
+    name: grr-mariadb-v2

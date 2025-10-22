@@ -74,3 +74,8 @@ personnalisation/langue/lang_subst.fr-fr.php
 personnalisation/configperso.inc.php
 personnalisation/css/perso.css
 personnalisation/config_ldap.inc.php
+
+docker/proxy/dev.*
+docker/proxy/ssl.pem
+
+.env
