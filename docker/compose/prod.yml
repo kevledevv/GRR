@@ -2,7 +2,10 @@ services:
   web:
     container_name: grr
     restart: unless-stopped
-    image: grr:${TAG:?err}
+    image: kevledevv/grr:${TAG:?err}
     build:
       context: ../../
       dockerfile: docker/php/prod.Dockerfile
+      platforms:
+        - "linux/amd64"
+        - "linux/arm64"

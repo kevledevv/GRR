@@ -1,26 +1,34 @@
 - group: [docker, dkr]
   name: [start, s]
-  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml up -d --force-recreate --remove-orphans
+  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else if .test }}test{{ else }}dev{{ end }}.yml up -d --force-recreate --remove-orphans
   desc: Start/restart the docker container
   flags:
     - name: [production]
       desc: Use production compose file
       default: false
       test: $bool
+    - name: [test]
+      desc: Use test compose file
+      default: false
+      test: $bool
 
 - group: docker
   name: [stop, k]
-  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml down --remove-orphans
+  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else if .test }}test{{ else }}dev{{ end }}.yml down --remove-orphans
   desc: Stop the docker container
   flags:
     - name: [production]
       desc: Use production compose file
       default: false
       test: $bool
+    - name: [test]
+      desc: Use test compose file
+      default: false
+      test: $bool
 
 - group: docker
   name: [exec, x]
-  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml exec -it {{ .container }} /bin/sh
+  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else if .test }}test{{ else }}dev{{ end }}.yml exec -it {{ .container }} /bin/sh
   desc: Open a bash terminal inside a container (default web)
   args:
     - name: container
@@ -31,11 +39,15 @@
       desc: Use production compose file
       default: false
       test: $bool
-      
+    - name: [test]
+      desc: Use test compose file
+      default: false
+      test: $bool
+
 - group: docker
   name: [logs, l]
   cmd: >
-    docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml
+    docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else if .test }}test{{ else }}dev{{ end }}.yml
     logs
     --no-log-prefix
     --tail {{ .tail }}
@@ -63,11 +75,20 @@
       desc: Use production compose file
       default: false
       test: $bool
+    - name: [test]
+      desc: Use test compose file
+      default: false
+      test: $bool
+
   cwd: .
 
 - group: docker
   name: [build, b]
-  cmd: docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml build --no-cache
+  cmd: >
+    {{ if .production }}COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1{{ end }}
+    docker compose -p grr -f docker/compose/{{ if .production }}prod{{ else }}dev{{ end }}.yml
+    build
+    --no-cache
   flags:
     - name: [production]
       desc: Use production compose file

@@ -2,11 +2,9 @@ services:
   web:
     container_name: grr
     restart: unless-stopped
-    build:
-      context: ../php
-      dockerfile: Dockerfile
+    image: kevledevv/grr:4.4.2
     volumes:
-      - ../..:/app/
+      - ../../img_grr/doudoune.png:/app/img_grr/totem_grr.png
     environment:
       PHP_LOG: stdout
       VIRTUAL_HOST: grr.localhost
@@ -24,7 +22,6 @@ services:
     command: mysqld --sql_mode=""
     volumes:
       - mysql:/var/lib/mysql
-      # - ../installation/tables.my.sql:/docker-entrypoint-initdb.d/db.sql
     environment:
       MYSQL_ROOT_PASSWORD: blunt&snakesR1337
       MYSQL_DATABASE: grr

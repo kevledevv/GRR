@@ -174,4 +174,6 @@ pm.max_requests = 200
 
 # Clean
 rm -rf /tmp/*
-rm -f /app/Dockerfile
+# Remove docker files, not needed
+rm -rf /app/docker
+rm -f /app/personnalisation/connect.inc.php
