@@ -11,7 +11,6 @@ RUN adduser -D -g "" "app"
 # App files
 WORKDIR /app
 COPY ./ ./
-COPY docker/php/version.txt /version.txt
 
 # Setup
 COPY docker/php/setup.sh /setup.sh
